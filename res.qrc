@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/shader/compiledShader/frag.spv</file>
+        <file>res/shader/compiledShader/vert.spv</file>
+        <file>res/shader/compile.bat</file>
+        <file>res/shader/sourceShader/shader.frag</file>
+        <file>res/shader/sourceShader/shader.vert</file>
+    </qresource>
+</RCC>
