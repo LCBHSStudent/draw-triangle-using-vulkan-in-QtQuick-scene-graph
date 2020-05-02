@@ -5,11 +5,21 @@ import VulkanBackend 1.14
 
 Item {
     id:         root
-    width:      450
-    height:     800
+    width:      1280
+    height:     720
 
     VulkanScene {
         id: vkScene
+        anchors.centerIn: parent
+        width: 700
+        height: 700
+        
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                console.log("rectangle!");
+            }
+        }
     }
     
     Slider {
@@ -22,6 +32,16 @@ Item {
         height: 20
         onValueChanged: {
             vkScene.value = value
+        }
+    }
+    
+    Timer {
+        running: true
+        repeat: true
+        interval: 1000/60
+        onTriggered: {
+            update()
+            console.log("update")
         }
     }
 }

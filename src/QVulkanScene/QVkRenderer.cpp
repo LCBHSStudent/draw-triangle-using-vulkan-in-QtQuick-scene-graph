@@ -18,6 +18,8 @@ VkRenderer::~VkRenderer() {
 
     m_devFuncs->vkDestroyBuffer(m_dev, m_ubuf, nullptr);
     m_devFuncs->vkFreeMemory(m_dev, m_ubufMem, nullptr);
+    m_devFuncs->vkDestroyBuffer(m_dev, m_indicesBuf, nullptr);
+    m_devFuncs->vkFreeMemory(m_dev, m_indicesMem, nullptr);
     
     m_devFuncs->vkDestroyCommandPool(m_dev, m_cmdPool, nullptr);
     
@@ -104,6 +106,8 @@ void VkRenderer::init(int framesInFlight) {
     // 创建顶点Buffer TODO: // indices
     createVertexBuffer(vertexData, m_vbuf, m_vbufMem);
     
+    // 创建indiceBuffer
+    createIndicesBuffer(indicesData, m_indicesBuf, m_indicesMem);
     
     // 创建UniformBuffer
     createUniformBuffer();
@@ -171,6 +175,13 @@ void VkRenderer::mainPassRecordingStart() {
         &dynamicOffset
     );
 
+    m_devFuncs->vkCmdBindIndexBuffer(
+        cmdBuf, 
+        m_indicesBuf,
+        0,
+        VK_INDEX_TYPE_UINT32
+    );
+    
     VkViewport viewPort = {
         0, 0,
         float(m_viewportSize.width()),
@@ -187,7 +198,7 @@ void VkRenderer::mainPassRecordingStart() {
         } 
     };
     m_devFuncs->vkCmdSetScissor(cmdBuf, 0, 1, &scissor);
-    m_devFuncs->vkCmdDraw(cmdBuf, 3, 1, 0, 0);
+    m_devFuncs->vkCmdDrawIndexed(cmdBuf, indicesData.size(), 1, 0, 0, 0);
     
     m_window->endExternalCommands();
     
@@ -415,9 +426,9 @@ void VkRenderer::createVertexBuffer(
 }
 
 void VkRenderer::createIndicesBuffer(
-        std::vector<float>& indicesVec,
-        VkBuffer&           indicesBuf,
-        VkDeviceMemory&     indicesMem
+        std::vector<uint32_t>&  indicesVec,
+        VkBuffer&               indicesBuf,
+        VkDeviceMemory&         indicesMem
 ) {
     VkDeviceSize bufSize = sizeof(indicesVec[0]) * indicesVec.size();
     
@@ -628,13 +639,13 @@ void VkRenderer::createGraphicsPipeline() {
         { // position
             0, // location
             0, // binding
-            VK_FORMAT_R32G32_SFLOAT,
+            VK_FORMAT_R32G32_SFLOAT,    //2float vec
             0
         },
         { // color
             1,
             0,
-            VK_FORMAT_R32G32B32_SFLOAT,
+            VK_FORMAT_R32G32B32_SFLOAT,     //3float vec
             2 * sizeof(float)
         }
     };

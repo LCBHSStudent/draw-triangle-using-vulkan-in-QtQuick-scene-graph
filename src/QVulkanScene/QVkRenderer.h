@@ -38,6 +38,12 @@ private FUNCTION:
             uint32_t                typeFilter,
             VkMemoryPropertyFlags   properties
         );
+    static inline VkDeviceSize
+        aligned(VkDeviceSize v, VkDeviceSize byteAlign) {
+            return (v + byteAlign - 1) & ~(byteAlign - 1);
+        }
+    QueueFamilyIndices
+        findQueueFamilies(VkPhysicalDevice device);
     VkDeviceSize 
         createBuffer(
             VkDeviceSize                size, 
@@ -45,34 +51,6 @@ private FUNCTION:
             VkMemoryPropertyFlags       properties,
             VkBuffer&                   buffer,
             VkDeviceMemory&             bufferMemory
-        );
-    static inline VkDeviceSize
-        aligned(VkDeviceSize v, VkDeviceSize byteAlign) {
-            return (v + byteAlign - 1) & ~(byteAlign - 1);
-        }
-    QueueFamilyIndices
-        findQueueFamilies(VkPhysicalDevice device);
-    void
-        createUniformBuffer();
-    void
-        createGraphicsPipeline();
-    void
-        createCommandPool();
-    void
-        createDescriptorPoolAndSets(int framesInFlight);
-//    void
-//        createCommandBuffer();
-    void 
-        createVertexBuffer(
-            std::vector<float>& vertexVec,
-            VkBuffer&           vertBuf,
-            VkDeviceMemory&     vertMem
-        );
-    void 
-        createIndicesBuffer(
-            std::vector<float>& indicesVec,
-            VkBuffer&           indicesBuf,
-            VkDeviceMemory&     indicesMem
         );
     void
         copyBuffer(
@@ -89,15 +67,43 @@ private FUNCTION:
     void 
         endSingleTimeCommand(VkCommandBuffer);
     
+    
+    void
+        createUniformBuffer();
+    void
+        createGraphicsPipeline();
+    void
+        createCommandPool();
+    void
+        createDescriptorPoolAndSets(int framesInFlight);
+    void 
+        createVertexBuffer(
+            std::vector<float>& vertexVec,
+            VkBuffer&           vertBuf,
+            VkDeviceMemory&     vertMem
+        );
+    void 
+        createIndicesBuffer(
+            std::vector<uint32_t>&  indicesVec,
+            VkBuffer&               indicesBuf,
+            VkDeviceMemory&         indicesMem
+        );
+    
 private Q_RESOURCE:
     static const int
         UNIFORM_DATA_SIZE   = 16 * sizeof(float);
     std::vector<float> 
         vertexData
     {
-         0.0f,   0.5f,   1.0f, 0.0f, 0.0f,
-        -0.5f,  -0.5f,   0.0f, 1.0f, 0.0f,
-         0.5f,  -0.5f,   0.0f, 0.0f, 1.0f
+        -1.0f,  -1.0f,   1.0f, 0.0f, 0.0f,
+         1.0f,  -1.0f,   0.0f, 1.0f, 0.0f,
+         1.0f,   1.0f,   0.0f, 0.0f, 1.0f,
+        -1.0f,   1.0f,   0.0f, 0.0f, 1.0f
+    };
+    std::vector<uint32_t>
+        indicesData 
+    {
+        0, 1, 2, 2, 3, 0
     };
     QSize 
         m_viewportSize;
@@ -149,6 +155,10 @@ private RESOURCE:
         m_ubufMem           = VK_NULL_HANDLE;
     VkDeviceSize 
         m_allocPerUbuf      = 0;
+    VkBuffer
+        m_indicesBuf        = VK_NULL_HANDLE;
+    VkDeviceMemory
+        m_indicesMem        = VK_NULL_HANDLE;
 
     VkDescriptorBufferInfo
         m_uniformBufInfo[

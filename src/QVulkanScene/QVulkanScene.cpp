@@ -68,6 +68,7 @@ void QVulkanScene::sync()
         // would render the squircle on top (overlay).
         connect(window(), &QQuickWindow::beforeRenderPassRecording, m_renderer, &VkRenderer::mainPassRecordingStart, Qt::DirectConnection);
     }
-    m_renderer->setViewportSize(window()->size() * window()->devicePixelRatio());
+    m_renderer->setViewportSize(QSize(width(), height()) * window()->devicePixelRatio());
+    
     m_renderer->setWindow(window());
 }
